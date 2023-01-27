@@ -1,0 +1,9 @@
+domain: wellerman.bouchaud.org
+layout:
+- go.kubebuilder.io/v3
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: wellerman
+repo: github.com/vbouchaud/wellerman
+version: "3"
