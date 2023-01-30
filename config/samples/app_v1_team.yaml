@@ -1,0 +1,12 @@
+apiVersion: app.wellerman.bouchaud.org/v1
+kind: Team
+metadata:
+  labels:
+    app.kubernetes.io/name: team
+    app.kubernetes.io/instance: team-sample
+    app.kubernetes.io/part-of: wellerman
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: wellerman
+  name: team-sample
+spec:
+  # TODO(user): Add fields here
