@@ -8,22 +8,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // TeamSpec defines the desired state of Team
 type TeamSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Comment string `json:"comment,omitempty"`
 
-	// Foo is an example field of Team. Edit team_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinItems:=1
+	Subjects []string `json:"subjects"`
 }
 
 // TeamStatus defines the observed state of Team
 type TeamStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Conditions        []metav1.Condition `json:"conditions"`
+	DistinguishedName string             `json:"dn,omitempty"`
 }
 
 //+kubebuilder:object:root=true

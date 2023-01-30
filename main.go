@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -18,6 +19,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	ldapClient "github.com/vbouchaud/wellerman/internal/ldap"
 
 	appv1 "github.com/vbouchaud/wellerman/api/v1"
 	"github.com/vbouchaud/wellerman/controllers"
@@ -45,6 +48,26 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+
+	// ldap related flags:
+	var (
+		ldapURL,
+		bindDN,
+		bindPassword,
+		groupSearchBase,
+		groupSearchScope,
+		groupSearchFilter,
+		groupNameProperty string
+		groupSearchAttributes []string
+	)
+	flag.StringVar(&ldapURL, "ldap-url", "", "The address (host and scheme) of the LDAP service.")
+	flag.StringVar(&bindDN, "bind-dn", "", "The service account DN to do the ldap search.")
+	flag.StringVar(&bindPassword, "bind-password", "", "The service account password to authenticate against the LDAP service.")
+	flag.StringVar(&groupSearchBase, "group-search-base", "", "The DN where the ldap search will take place.")
+	flag.StringVar(&groupSearchScope, "group-search-scope", ldapClient.ScopeSingleLevel, fmt.Sprintf("The scope of the search. Can take to values base object: '%s', single level: '%s' or whole subtree: '%s'.", ldapClient.ScopeBaseObject, ldapClient.ScopeSingleLevel, ldapClient.ScopeWholeSubtree))
+	flag.StringVar(&groupSearchFilter, "group-search-filter", "(&(objectClass=groupOfUniqueNames)(cn=%s))", "The filter to select groups.")
+	flag.StringVar(&groupNameProperty, "group-name-property", "cn", "The attribute that contains group names.")
+
 	opts := zap.Options{
 		Development: true,
 	}
@@ -52,6 +75,17 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	ldap := ldapClient.NewInstance(
+		ldapURL,
+		bindDN,
+		bindPassword,
+		groupSearchBase,
+		groupSearchScope,
+		groupSearchFilter,
+		groupNameProperty,
+		groupSearchAttributes,
+	)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
@@ -80,6 +114,7 @@ func main() {
 	if err = (&controllers.TeamReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		Ldap:   ldap,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Team")
 		os.Exit(1)
