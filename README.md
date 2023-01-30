@@ -5,7 +5,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/vbouchaud/wellerman?style=for-the-badge)](https://goreportcard.com/report/github.com/vbouchaud/wellerman)
 [![Artifact Hub](https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/vbouchaud)](https://artifacthub.io/packages/search?repo=vbouchaud)
 
-// TODO(user): Add simple overview of use/purpose
+An operator initialized with operator-sdk aiming to ease and automate the management and configuration of Projects across multiple services.
+
+This project is still in early stage of developement, DO NOT USE.
+
+When completed, it should hopefully manage Project resources creation across gitlab, harbor, vault, kubernetes, ldap, grafana, including role base access to these services when available.
 
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
