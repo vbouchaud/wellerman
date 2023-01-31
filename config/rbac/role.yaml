@@ -8,6 +8,32 @@ rules:
 - apiGroups:
   - app.wellerman.bouchaud.org
   resources:
+  - projects
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - app.wellerman.bouchaud.org
+  resources:
+  - projects/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - app.wellerman.bouchaud.org
+  resources:
+  - projects/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - app.wellerman.bouchaud.org
+  resources:
   - teams
   verbs:
   - create

@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	gitlabClient "github.com/vbouchaud/wellerman/internal/gitlab"
 	ldapClient "github.com/vbouchaud/wellerman/internal/ldap"
 
 	appv1 "github.com/vbouchaud/wellerman/api/v1"
@@ -68,6 +69,14 @@ func main() {
 	flag.StringVar(&groupSearchFilter, "group-search-filter", "(&(objectClass=groupOfUniqueNames)(cn=%s))", "The filter to select groups.")
 	flag.StringVar(&groupNameProperty, "group-name-property", "cn", "The attribute that contains group names.")
 
+	// gitlab related flags:
+	var (
+		gitlabURL,
+		gitlabToken string
+	)
+	flag.StringVar(&gitlabURL, "gitlab-url", "", "The address (host and scheme and route) of the gitlab api.")
+	flag.StringVar(&gitlabToken, "gitlab-token", "", "The token to authenticate with.")
+
 	opts := zap.Options{
 		Development: true,
 	}
@@ -86,6 +95,15 @@ func main() {
 		groupNameProperty,
 		groupSearchAttributes,
 	)
+
+	gitlab, err := gitlabClient.NewInstance(
+		gitlabURL,
+		gitlabToken,
+	)
+	if err != nil {
+		setupLog.Error(err, "unable to create gitlab client")
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
@@ -117,6 +135,14 @@ func main() {
 		Ldap:   ldap,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Team")
+		os.Exit(1)
+	}
+	if err = (&controllers.ProjectReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Gitlab: gitlab,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Project")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -16,4 +16,13 @@ resources:
   kind: Team
   path: github.com/vbouchaud/wellerman/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: wellerman.bouchaud.org
+  group: app
+  kind: Project
+  path: github.com/vbouchaud/wellerman/api/v1
+  version: v1
 version: "3"
