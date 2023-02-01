@@ -24,3 +24,8 @@ Dockerfile.cross
 *.swp
 *.swo
 *~
+
+# environment related files
+/.env
+/.env.*
+
