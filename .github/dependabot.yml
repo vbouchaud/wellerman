@@ -7,9 +7,11 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "gomod"
-  - package-ecosystem: "docker"
+    target-branch: "dependencies"
+- package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "docker"
+    target-branch: "dependencies"
